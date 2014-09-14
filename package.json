@@ -1,0 +1,26 @@
+{
+  "name": "tails3",
+  "version": "0.0.0",
+  "description": "Tail the log files created by s3-streamlogger",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Coggle/tails3.git"
+  },
+  "keywords": [
+    "logging",
+    "s3"
+  ],
+  "author": "James Crosby <james@coggle.it>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Coggle/tails3/issues"
+  },
+  "homepage": "https://github.com/Coggle/tails3",
+  "dependencies": {
+    "aws-sdk": "^2.0.17"
+  }
+}
