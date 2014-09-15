@@ -25,6 +25,32 @@ function lengthlimit(line, length){
     return line;
 }
 
+function applyColor(color, line){
+    return line[color];
+}
+
+function logLine(color, isdebug, ts, line){
+    var stack = line.stack;
+    var host  = line.hostname;
+    var level = line.level;
+    if(line.message)
+        line.message = lengthlimit(line.message);
+    if(stack)
+        stack = stack.replace(/\\n/g, '\n');
+    delete line.stack;
+    delete line.hostname;
+    delete line.level;
+    delete line.timestamp;
+    
+    if(isdebug){
+        console.log('[' + ts +' '+ level.bold +' '+ host + '] ' + applyColor('grey', JSON.stringify(line)));
+    }else{
+        console.log(applyColor(color, '[' + ts +' '+ level.bold +' '+ host + '] ' + JSON.stringify(line)));
+    }
+    if(stack)
+        console.log(stack[color]);
+}
+
 function main(){
     process.title = 'tails3';
 
@@ -65,30 +91,21 @@ function main(){
             var ts = new Date(line.timestamp);
             var ts_as_utc = asUTC(ts);
             var ts_as_utc_strffed = strftime(Date_Format, ts_as_utc)
-            var stack = line.stack;
-            if(line.message)
-                line.message = lengthlimit(line.message);
-            if(stack)
-                stack = stack.replace(/\\n/g, '\n');
-            delete line.stack;
-            delete line.timestamp;
+            var level = line.level;
+            
             if(ts_as_utc_strffed > since){
                 ts = String(ts);
-                if(line.level == 'critical'){
-                    console.log(ts, line.level.purple.bold, JSON.stringify(line).purple);
-                    if(stack) console.log(stack.purple);
-                }else if(line.level == 'error'){
-                    console.log(ts, line.level.red.bold, JSON.stringify(line).red);
-                    if(stack) console.log(stack.red);
-                }else if(line.level == 'warning'){
-                    console.log(ts, line.level.yellow.bold, JSON.stringify(line).yellow);
-                    if(stack) console.log(stack.yellow);
-                }else if(line.level == 'debug'){
-                    console.log(ts, line.level.bold, JSON.stringify(line).grey);
-                    if(stack) console.log(stack.grey);
+
+                if(level == 'critical'){
+                    logLine('magenta', false, ts, line);
+                }else if(level == 'error'){
+                    logLine('red', false, ts, line);
+                }else if(level == 'warn'){
+                    logLine('yellow', false, ts, line);
+                }else if(level == 'debug'){
+                    logLine('white', true, ts, line);
                 }else{
-                    console.log(ts, line.level.bold, JSON.stringify(line));
-                    if(stack) console.log(stack);
+                    logLine('white', false, ts, line);
                 }
             }
         });
