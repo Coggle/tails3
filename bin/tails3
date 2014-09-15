@@ -42,7 +42,7 @@ function logLine(color, isdebug, ts, line){
     delete line.level;
     delete line.timestamp;
 
-    ts = strftime(Date_Format, ts);
+    ts = strftime("%Y/%m/%d %H:%M:%S.%L", ts);
     
     if(typeof color === 'undefined'){
         console.log(applyColor('bold', '[' + ts +' '+ level +' '+ host + '] ') + JSON.stringify(line));
