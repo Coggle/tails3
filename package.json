@@ -2,7 +2,7 @@
   "name": "tails3",
   "version": "0.0.0",
   "description": "Tail the log files created by s3-streamlogger",
-  "main": "index.js",
+  "bin": "bin/tails3",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -21,6 +21,11 @@
   },
   "homepage": "https://github.com/Coggle/tails3",
   "dependencies": {
-    "aws-sdk": "^2.0.17"
+    "aws-sdk": "^2.0.17",
+    "nopt": "^3.0.1",
+    "async": "~0.9.0",
+    "byline": "^4.1.1",
+    "colors": "~0.6.2",
+    "strftime": "~0.8.2"
   }
 }

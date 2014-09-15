@@ -28,6 +28,9 @@ node_modules
 .*.swo
 .*.swp
 .*.swn
+.swo
+.swp
+.swn
 
 # OS Files
 .DS_Store

@@ -1,0 +1,79 @@
+#!/usr/bin/env node
+
+var nopt = require('nopt');
+var tails3 = require('../lib/tails3')
+var colors = require('colors');
+var strftime = require('strftime');
+
+var Date_Format = "%Y-%m-%d-%H-%M";
+
+function asUTC(d){
+    return new Date(
+        d.getUTCFullYear(),
+        d.getUTCMonth(),
+        d.getUTCDate(),
+        d.getUTCHours(),
+        d.getUTCMinutes(),
+        d.getUTCSeconds()
+    );
+}
+
+function main(){
+    process.title = 'tails3';
+
+    var opts = {
+        "bucket":String,
+        "stage":String,
+        "since":String
+    };
+    var shorthands = {
+        "b": ["--bucket"]
+    };
+    var parsed = nopt(opts, shorthands);
+
+    if(!parsed.bucket)
+        throw new Error('--bucket is required');
+    if(parsed.since && parsed.since.split('-').length != 5)
+        throw new Error('--since must be of the form YYYY-mm-DD-HH-MM');
+
+    var one_hour_ago = new Date();
+    one_hour_ago.setUTCHours(one_hour_ago.getUTCHours()-1);
+
+    var one_hour_ago_as_utc = asUTC(one_hour_ago);
+    var one_hour_ago_strffed = strftime(Date_Format, one_hour_ago_as_utc);
+
+    var stage  = parsed.stage || 'production';
+    var bucket = parsed.bucket;
+    var since  = parsed.since || one_hour_ago_strffed;
+    
+    // need to get files up to an hour older than the time we care about, as
+    // files can contain hour-old data
+    var sp = since.split("-");
+    var since_minus_one_hour = new Date(sp[0], sp[1]-1, sp[2], sp[3] - 1, sp[4]);
+    var since_minus_one_hour_strffed = strftime(Date_Format, since_minus_one_hour);
+
+    tails3.getLogDataInRange(bucket, since_minus_one_hour_strffed, '9999-99-99-99-99', stage, function(err, log_objects){
+        if(err) throw err;
+        log_objects.forEach(function(line){
+            var ts = new Date(line.timestamp);
+            var ts_as_utc = asUTC(ts);
+            var ts_as_utc_strffed = strftime(Date_Format, ts_as_utc)
+            if(ts_as_utc_strffed > since){
+                ts = String(ts);
+                if(line.level == 'critical'){
+                    console.log(ts, line.level.purple.bold, JSON.stringify(line).purple);
+                }else if(line.level == 'error'){
+                    console.log(ts, line.level.red.bold, JSON.stringify(line).red);
+                }else if(line.level == 'warning'){
+                    console.log(ts, line.level.yellow.bold, JSON.stringify(line).yellow);
+                }else if(line.level == 'debug'){
+                    console.log(ts, line.level.bold, JSON.stringify(line).grey);
+                }else{
+                    console.log(ts, line.level.bold, JSON.stringify(line));
+                }
+            }
+        });
+    });
+}
+
+main();
