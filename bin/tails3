@@ -18,6 +18,13 @@ function asUTC(d){
     );
 }
 
+function lengthlimit(line, length){
+    length = length || 120;
+    if(line.length > length-3)
+        line = line.substr(0, length-3) + '...';
+    return line;
+}
+
 function main(){
     process.title = 'tails3';
 
@@ -58,18 +65,30 @@ function main(){
             var ts = new Date(line.timestamp);
             var ts_as_utc = asUTC(ts);
             var ts_as_utc_strffed = strftime(Date_Format, ts_as_utc)
+            var stack = line.stack;
+            if(line.message)
+                line.message = lengthlimit(line.message);
+            if(stack)
+                stack = stack.replace(/\\n/g, '\n');
+            delete line.stack;
+            delete line.timestamp;
             if(ts_as_utc_strffed > since){
                 ts = String(ts);
                 if(line.level == 'critical'){
                     console.log(ts, line.level.purple.bold, JSON.stringify(line).purple);
+                    if(stack) console.log(stack.purple);
                 }else if(line.level == 'error'){
                     console.log(ts, line.level.red.bold, JSON.stringify(line).red);
+                    if(stack) console.log(stack.red);
                 }else if(line.level == 'warning'){
                     console.log(ts, line.level.yellow.bold, JSON.stringify(line).yellow);
+                    if(stack) console.log(stack.yellow);
                 }else if(line.level == 'debug'){
                     console.log(ts, line.level.bold, JSON.stringify(line).grey);
+                    if(stack) console.log(stack.grey);
                 }else{
                     console.log(ts, line.level.bold, JSON.stringify(line));
+                    if(stack) console.log(stack);
                 }
             }
         });
