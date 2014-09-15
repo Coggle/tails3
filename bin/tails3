@@ -41,11 +41,15 @@ function logLine(color, isdebug, ts, line){
     delete line.hostname;
     delete line.level;
     delete line.timestamp;
+
+    ts = strftime(Date_Format, ts);
     
-    if(isdebug){
-        console.log('[' + ts +' '+ level.bold +' '+ host + '] ' + applyColor('grey', JSON.stringify(line)));
+    if(typeof color === 'undefined'){
+        console.log(applyColor('bold', '[' + ts +' '+ level +' '+ host + '] ') + JSON.stringify(line));
+    }else if(isdebug){
+        console.log(applyColor('bold', '[' + ts +' '+ level +' '+ host + '] ') + applyColor('grey', JSON.stringify(line)));
     }else{
-        console.log(applyColor(color, '[' + ts +' '+ level.bold +' '+ host + '] ' + JSON.stringify(line)));
+        console.log(applyColor(color, applyColor('bold', '[' + ts +' '+ level +' '+ host + '] ') + JSON.stringify(line)));
     }
     if(stack)
         console.log(stack[color]);
@@ -103,9 +107,9 @@ function main(){
                 }else if(level == 'warn'){
                     logLine('yellow', false, ts, line);
                 }else if(level == 'debug'){
-                    logLine('white', true, ts, line);
+                    logLine(undefined, true, ts, line);
                 }else{
-                    logLine('white', false, ts, line);
+                    logLine(undefined, false, ts, line);
                 }
             }
         });
