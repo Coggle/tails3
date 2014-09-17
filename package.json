@@ -1,6 +1,6 @@
 {
   "name": "tails3",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Tail the log files created by s3-streamlogger",
   "bin": "bin/tails3",
   "scripts": {
