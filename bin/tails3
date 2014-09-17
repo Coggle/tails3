@@ -27,7 +27,7 @@ function applyColor(color, line){
     return line[color];
 }
 
-function logLine(color, isdebug, ts, line){
+function printLine(color, isdebug, ts, line){
     var stack   = line.stack;
     var host    = line.hostname;
     var level   = line.level;
@@ -48,6 +48,25 @@ function logLine(color, isdebug, ts, line){
     if(stack)
         console.log(stack[color]);
 }
+function formatLine(line){
+    var ts = new Date(line.timestamp);
+    var ts_as_utc = asUTC(ts);
+    var ts_as_utc_strffed = tails3.bucketDateFormat(ts_as_utc)
+    var level = line.level;
+    
+    if(level == 'critical'){
+        printLine('magenta', false, ts, line);
+    }else if(level == 'error'){
+        printLine('red', false, ts, line);
+    }else if(level == 'warn'){
+        printLine('yellow', false, ts, line);
+    }else if(level == 'debug'){
+        printLine(undefined, true, ts, line);
+    }else{
+        printLine(undefined, false, ts, line);
+    }
+}
+
 
 function main(){
     process.title = 'tails3';
@@ -74,41 +93,16 @@ function main(){
     var bucket = parsed.bucket;
     var since  = parsed.since || one_hour_ago_strffed;
     
-    // need to get files up to an hour older than the time we care about, as
-    // files can contain hour-old data
     var sp = since.split("-");
-    var since_minus_one_hour = new Date(sp[0], sp[1]-1, sp[2], sp[3] - 1, sp[4]);
-    var since_minus_one_hour_strffed = tails3.bucketDateFormat(since_minus_one_hour);
+    var since = new Date(sp[0], sp[1]-1, sp[2], sp[3], sp[4]);
 
-    var s = new tails3.BucketFileStream(bucket, since_minus_one_hour_strffed, stage);
+    var s = new tails3.BucketDataStream(bucket, since, stage);
     
-    s.on('file', function(f){console.log('new file:', f);});
-    s.on('error', function(e){console.log('error:', e);});
-
-
-    //tails3.getLogDataInRange(bucket, since_minus_one_hour_strffed, '9999-99-99-99-99', stage, function(err, log_objects){
-    //    if(err) throw err;
-    //    log_objects.forEach(function(line){
-    //        var ts = new Date(line.timestamp);
-    //        var ts_as_utc = asUTC(ts);
-    //        var ts_as_utc_strffed = tails3.bucketDateFormat(ts_as_utc)
-    //        var level = line.level;
-    //        
-    //        if(ts_as_utc_strffed > since){
-    //            if(level == 'critical'){
-    //                logLine('magenta', false, ts, line);
-    //            }else if(level == 'error'){
-    //                logLine('red', false, ts, line);
-    //            }else if(level == 'warn'){
-    //                logLine('yellow', false, ts, line);
-    //            }else if(level == 'debug'){
-    //                logLine(undefined, true, ts, line);
-    //            }else{
-    //                logLine(undefined, false, ts, line);
-    //            }
-    //        }
-    //    });
-    //});
+    s.on('line', formatLine);
+    s.on('error', function(e){
+        console.log('error:', e);
+        process.exit(1);
+    });
 }
 
 main();
