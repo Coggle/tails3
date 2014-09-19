@@ -11,7 +11,7 @@ It's designed to work with logs produced by
 You need to have an AWS S3 bucket with log files using the naming convention
 `%Y-%m-%d-%H-%M-<stage>-<hostname>.log`. ("stage" could be any group, but at
 Coggle we use it to refer to the groups of servers that are used in production,
-testing and development.
+testing and development).
 
 ### Installation and Usage
 ```sh

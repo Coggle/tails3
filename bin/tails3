@@ -33,7 +33,13 @@ function printLine(color, isdebug, ts, line){
     var level   = line.level;
     var message = line.message;
 
-    if(message) message = lengthlimit(line.message);
+    // default to using the line as the message, if it doesn't look like a
+    // structured line
+    if(message)
+        message = lengthlimit(line.message);
+    else
+        message = line;
+
     if(stack) stack = stack.replace(/\\n/g, '\n');
 
     ts = strftime("%Y/%m/%d %H:%M:%S.%L", ts);
@@ -49,9 +55,7 @@ function printLine(color, isdebug, ts, line){
         console.log(stack[color]);
 }
 function formatLine(line){
-    var ts = new Date(line.timestamp);
-    var ts_as_utc = asUTC(ts);
-    var ts_as_utc_strffed = tails3.bucketDateFormat(ts_as_utc)
+    var ts = line.timetamp? new Date(line.timestamp) : undefined;
     var level = line.level;
     
     if(level == 'critical'){
