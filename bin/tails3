@@ -36,13 +36,16 @@ function printLine(color, isdebug, ts, line){
     // default to using the line as the message, if it doesn't look like a
     // structured line
     if(message)
-        message = lengthlimit(line.message);
+        message = lengthlimit(line.message, 800);
     else
         message = line;
 
     if(stack) stack = stack.replace(/\\n/g, '\n');
 
-    ts = strftime("%Y/%m/%d %H:%M:%S.%L", ts);
+    if(typeof ts === 'undefined')
+        ts = 'unknown';
+    else
+        ts = strftime("%Y/%m/%d %H:%M:%S.%L", ts);
     
     if(typeof color === 'undefined'){
         console.log(applyColor('bold', '[' + ts +' '+ level +' '+ host + '] ') + message);
@@ -55,7 +58,7 @@ function printLine(color, isdebug, ts, line){
         console.log(stack[color]);
 }
 function formatLine(line){
-    var ts = line.timetamp? new Date(line.timestamp) : undefined;
+    var ts = line.timestamp? new Date(line.timestamp) : undefined;
     var level = line.level;
     
     if(level == 'critical'){
