@@ -16,6 +16,10 @@ function asUTC(d){
     );
 }
 
+function oneHourAgo(){
+    return new Date((new Date).getTime() - 3600000);
+}
+
 function lengthlimit(line, length){
     length = length || 160;
     if(line.length > length-3)
@@ -93,7 +97,7 @@ function main(){
     if(parsed.since && parsed.since.split('-').length != 5)
         throw new Error('--since must be of the form YYYY-mm-DD-HH-MM');
 
-    var one_hour_ago_as_utc = asUTC(tails3.oneHourAgo());
+    var one_hour_ago_as_utc = asUTC(oneHourAgo());
     var one_hour_ago_strffed = tails3.bucketDateFormat(one_hour_ago_as_utc);
 
     var stage  = parsed.stage || 'production';
