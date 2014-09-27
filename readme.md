@@ -1,4 +1,5 @@
 ### tails3: Tail S3 Logs
+[![NPM version](https://badge.fury.io/js/tails3.svg)](http://badge.fury.io/js/tails3)
 
 This script prints the most recent log messages from log files in an AWS S3
 bucket. It isn't quite real-time, as getting files from S3 involves polling,
