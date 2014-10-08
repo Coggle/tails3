@@ -5,17 +5,6 @@ var tails3 = require('../lib/tails3')
 var colors = require('colors');
 var strftime = require('strftime');
 
-function asUTC(d){
-    return new Date(
-        d.getUTCFullYear(),
-        d.getUTCMonth(),
-        d.getUTCDate(),
-        d.getUTCHours(),
-        d.getUTCMinutes(),
-        d.getUTCSeconds()
-    );
-}
-
 function oneHourAgo(){
     return new Date((new Date).getTime() - 3600000);
 }
@@ -95,10 +84,9 @@ function main(){
     if(!parsed.bucket)
         throw new Error('--bucket is required');
     if(parsed.since && parsed.since.split('-').length != 5)
-        throw new Error('--since must be of the form YYYY-mm-DD-HH-MM');
+        throw new Error('--since must be of the form YYYY-mm-DD-HH-MM (interpreted in local timezone)');
 
-    var one_hour_ago_as_utc = asUTC(oneHourAgo());
-    var one_hour_ago_strffed = tails3.bucketDateFormat(one_hour_ago_as_utc);
+    var one_hour_ago_strffed = tails3.bucketDateFormat(oneHourAgo());
 
     var stage  = parsed.stage || 'production';
     var bucket = parsed.bucket;
