@@ -20,6 +20,25 @@ function applyColor(color, line){
     return line[color];
 }
 
+function tryPrettyPrint(line){
+    var formatted;
+    var parsed
+    try {
+        var parsed = JSON.parse(line);
+        if(typeof parsed === 'string'){
+            // if it was a single string, then try parsing again, in case this
+            // string was doubly-json-encoded:
+            try{
+                parsed = JSON.parse(parsed);
+            } catch(e){ }
+        }
+        formatted = JSON.stringify(parsed, null, '  ');
+    }catch(e){
+        formatted = line;
+    }
+    return formatted;
+}
+
 function printLine(color, isdebug, ts, line){
     var stack   = line.stack;
     var host    = line.hostname;
@@ -29,9 +48,13 @@ function printLine(color, isdebug, ts, line){
     // default to using the line as the message, if it doesn't look like a
     // structured line
     if(message)
-        message = lengthlimit(line.message, 800);
+        message = line.message;
     else
         message = line;
+
+    // if the message is JSON, then parse and pretty-print it:
+    var formatted = tryPrettyPrint(message);
+
 
     if(stack) stack = stack.replace(/\\n/g, '\n');
 
@@ -41,11 +64,11 @@ function printLine(color, isdebug, ts, line){
         ts = strftime("%Y/%m/%d %H:%M:%S.%L", ts);
     
     if(typeof color === 'undefined'){
-        console.log(applyColor('bold', '[' + ts +' '+ level +' '+ host + '] ') + message);
+        console.log(applyColor('bold', '[' + ts +' '+ level +' '+ host + '] ') + formatted);
     }else if(isdebug){
-        console.log(applyColor('bold', '[' + ts +' '+ level +' '+ host + '] ') + applyColor('grey', message));
+        console.log(applyColor('bold', '[' + ts +' '+ level +' '+ host + '] ') + applyColor('grey', formatted));
     }else{
-        console.log(applyColor(color, applyColor('bold', '[' + ts +' '+ level +' '+ host + '] ') + message));
+        console.log(applyColor(color, applyColor('bold', '[' + ts +' '+ level +' '+ host + '] ') + formatted));
     }
     if(stack)
         console.log(stack[color]);
