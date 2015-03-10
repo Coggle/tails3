@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/Coggle/tails3",
   "dependencies": {
-    "aws-sdk": "^2.0.17",
+    "aws-sdk": "^2.1.16",
     "nopt": "^3.0.1",
     "async": "~0.9.0",
     "byline": "^4.1.1",
