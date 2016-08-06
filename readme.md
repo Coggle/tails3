@@ -28,6 +28,11 @@ leave that option off:
 tails3 --bucket=your-log-bucket-name
 ```
 
+To filter by regex on the `hostname` property of logged lines:
+```sh
+tails3 --bucket=your-log-bucket-name --host="^fred[0-9]*$"
+```
+
 ### License
 [ISC](http://opensource.org/licenses/ISC): equivalent to 2-clause BSD.
 
