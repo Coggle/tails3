@@ -97,10 +97,12 @@ function main(){
     var opts = {
         "bucket":String,
         "stage":String,
-        "since":String
+        "since":String,
+        "host":String
     };
     var shorthands = {
-        "b": ["--bucket"]
+        "b": ["--bucket"],
+        "h": ["--hodt"],
     };
     var parsed = nopt(opts, shorthands);
 
@@ -114,13 +116,23 @@ function main(){
     var stage  = parsed.stage || 'production';
     var bucket = parsed.bucket;
     var since  = parsed.since || one_hour_ago_strffed;
+    var host   = null;
+
+    if(parsed.host){
+        host = new RegExp(parsed.host);
+    }
     
     var sp = since.split("-");
     var since = new Date(sp[0], sp[1]-1, sp[2], sp[3], sp[4]);
 
     var s = new tails3.BucketDataStream(bucket, since, stage);
     
-    s.on('line', formatLine);
+    s.on('line', function(line){
+        if(host && !host.exec(line.hostname)){
+            return;
+        }
+        return formatLine(line)
+    });
     s.on('error', function(e){
         console.log('error:', e);
         process.exit(1);
