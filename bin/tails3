@@ -98,11 +98,15 @@ function main(){
         "bucket":String,
         "stage":String,
         "since":String,
-        "host":String
+        "host":String,
+        "awsKey": String,
+        "awsSecret": String
     };
     var shorthands = {
         "b": ["--bucket"],
         "h": ["--hodt"],
+        "ak": ["--awsKey"],
+        "as": ["-awsSecret-"]
     };
     var parsed = nopt(opts, shorthands);
 
@@ -117,7 +121,9 @@ function main(){
     var bucket = parsed.bucket;
     var since  = parsed.since || one_hour_ago_strffed;
     var host   = null;
-
+    var awsKey = parsed.awsKey;
+    var awsSecret = parsed.awsSecret;
+    
     if(parsed.host){
         host = new RegExp(parsed.host);
     }
@@ -125,7 +131,7 @@ function main(){
     var sp = since.split("-");
     var since = new Date(sp[0], sp[1]-1, sp[2], sp[3], sp[4]);
 
-    var s = new tails3.BucketDataStream(bucket, since, stage);
+    var s = new tails3.BucketDataStream(bucket, since, stage, awsKey, awsSecret);
     
     s.on('line', function(line){
         if(host && !host.exec(line.hostname)){
