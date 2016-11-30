@@ -22,9 +22,9 @@ function applyColor(color, line){
 
 function tryPrettyPrint(line){
     var formatted;
-    var parsed
+    var parsed;
     try {
-        var parsed = JSON.parse(line);
+        parsed = JSON.parse(line);
         if(typeof parsed === 'string'){
             // if it was a single string, then try parsing again, in case this
             // string was doubly-json-encoded:
