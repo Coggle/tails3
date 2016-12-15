@@ -102,7 +102,7 @@ function main(){
     };
     var shorthands = {
         "b": ["--bucket"],
-        "h": ["--hodt"],
+        "h": ["--host"],
     };
     var parsed = nopt(opts, shorthands);
 
