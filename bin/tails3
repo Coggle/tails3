@@ -1,19 +1,12 @@
 #!/usr/bin/env node
 
 var nopt = require('nopt');
-var tails3 = require('../lib/tails3')
-var colors = require('colors');
+var tails3 = require('../lib/tails3');
+var colors = require('colors'); // eslint-disable-line
 var strftime = require('strftime');
 
 function oneHourAgo(){
     return new Date((new Date).getTime() - 3600000);
-}
-
-function lengthlimit(line, length){
-    length = length || 160;
-    if(line.length > length-3)
-        line = line.substr(0, length-3) + '...';
-    return line;
 }
 
 function applyColor(color, line){
@@ -30,7 +23,7 @@ function tryPrettyPrint(line){
             // string was doubly-json-encoded:
             try{
                 parsed = JSON.parse(parsed);
-            } catch(e){ }
+            } catch(e){ } // eslint-disable-line 
         }
         formatted = JSON.stringify(parsed, null, '  ');
     }catch(e){
@@ -98,6 +91,7 @@ function main(){
         "bucket":String,
         "stage":String,
         "since":String,
+        "until":String,
         "host":String
     };
     var shorthands = {
@@ -110,12 +104,15 @@ function main(){
         throw new Error('--bucket is required');
     if(parsed.since && parsed.since.split('-').length != 5)
         throw new Error('--since must be of the form YYYY-mm-DD-HH-MM (interpreted in local timezone)');
+    if(parsed.until && parsed.until.split('-').length != 5)
+        throw new Error('--until must be of the form YYYY-mm-DD-HH-MM (interpreted in local timezone)');
 
     var one_hour_ago_strffed = tails3.bucketDateFormat(oneHourAgo());
 
     var stage  = parsed.stage || 'production';
     var bucket = parsed.bucket;
     var since  = parsed.since || one_hour_ago_strffed;
+    var until  = parsed.until || null;
     var host   = null;
 
     if(parsed.host){
@@ -123,15 +120,23 @@ function main(){
     }
     
     var sp = since.split("-");
-    var since = new Date(sp[0], sp[1]-1, sp[2], sp[3], sp[4]);
+    since = new Date(sp[0], sp[1]-1, sp[2], sp[3], sp[4]);
 
-    var s = new tails3.BucketDataStream(bucket, since, stage);
+    if(until){
+        sp = until.split("-");
+        until = new Date(sp[0], sp[1]-1, sp[2], sp[3], sp[4]);
+    }
+
+    var s = new tails3.BucketDataStream(bucket, since, stage, until);
     
     s.on('line', function(line){
         if(host && !host.exec(line.hostname)){
             return;
         }
         return formatLine(line)
+    });
+    s.on('end', function(e){
+        process.exit(0);
     });
     s.on('error', function(e){
         console.log('error:', e);

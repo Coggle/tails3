@@ -27,5 +27,10 @@
     "byline": "^4.1.1",
     "colors": "~0.6.2",
     "strftime": "~0.8.2"
+  },
+  "devDependencies": {
+    "eslint": "^3.13.1",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^3.0.1"
   }
 }
