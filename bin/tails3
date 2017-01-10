@@ -135,7 +135,7 @@ function main(){
         }
         return formatLine(line)
     });
-    s.on('end', function(e){
+    s.on('end', function(){
         process.exit(0);
     });
     s.on('error', function(e){
