@@ -33,6 +33,18 @@ To filter by regex on the `hostname` property of logged lines:
 tails3 --bucket=your-log-bucket-name --host="^fred[0-9]*$"
 ```
 
+To display a specific time range:
+
+```sh
+# display log entries since 10th January 2017, 13:24, up to the present (and
+# continue showing future entries as they are added)
+tails3 --bucket=your-log-bucket-name --since=2017-01-10-13-24
+
+# display log entries since 7th April 2016, 8pm-9pm only, then exit
+tails3 --bucket=your-log-bucket-name --since=2016-04-07-20-00 --until=2016-04-07-21-00
+```
+
+
 ### License
 [ISC](http://opensource.org/licenses/ISC): equivalent to 2-clause BSD.
 
