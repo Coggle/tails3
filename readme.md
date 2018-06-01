@@ -19,6 +19,11 @@ testing and development).
 npm install -g tails3
 ```
 
+Ensure that the AWS credentials to access your bucket are [set in your
+environment](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html) 
+(for example by setting the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
+environment variables).
+
 ```sh
 tails3 --bucket=your-log-bucket-name --stage=production
 ```
